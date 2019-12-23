@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Memory
+namespace Visualizer
 {
     public class RefType : DataType
     {

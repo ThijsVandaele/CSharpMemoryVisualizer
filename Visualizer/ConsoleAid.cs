@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.RegularExpressions;
 
 namespace Core
 {
@@ -60,6 +61,48 @@ namespace Core
             choiceInt = choice;
 
             return possibilities[choice != 0 ? choice - 1 : choice];
+        }
+
+        internal static string ReadText(string title, bool emptyAllowed = false, 
+            bool spacesAllowed = false, bool firstCharNumberAllowed = false)
+        {
+            Console.WriteLine(title);
+            var text = Console.ReadLine();
+            var feedback = GetFeedbackOfReadText(text, emptyAllowed, spacesAllowed, firstCharNumberAllowed);
+
+            while (!string.IsNullOrEmpty(feedback))
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(feedback);
+                Console.ForegroundColor = ConsoleColor.Black;
+                Console.WriteLine(title);
+                text = Console.ReadLine();
+
+                feedback = GetFeedbackOfReadText(text, emptyAllowed, spacesAllowed, firstCharNumberAllowed);
+            }
+
+            return text;
+        }
+
+        public static string GetFeedbackOfReadText(string text, bool emptyAllowed,
+            bool spacesAllowed, bool firstCharNumberAllowed)
+        {
+            var feedback = string.Empty;
+            feedback += $"{(string.IsNullOrEmpty(text) && !emptyAllowed ? "mag niet leeg zijn, " : "")}";
+            feedback += $"{(HasStringSpaces(text) && !spacesAllowed ? "mag geen spaties hebben, " : "")}";
+            feedback += $"{(StartStringWithNumber(text) && !firstCharNumberAllowed ? "mag niet starten met een getal, " : "")}";
+
+            return feedback;
+        }
+
+        public static bool HasStringSpaces(string line)
+        {
+            return line.Contains(' ');
+        }
+
+        public static bool StartStringWithNumber(string line)
+        {
+            return Regex.IsMatch(line, @"^\d");
         }
 
         public static void PrintTitle(string title)

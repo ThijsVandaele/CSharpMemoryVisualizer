@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Memory {
+namespace Visualizer {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace Memory {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Memory.DataTypesR", typeof(DataTypesR).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Visualizer.DataTypesR", typeof(DataTypesR).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;

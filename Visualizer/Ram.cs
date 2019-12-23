@@ -1,7 +1,7 @@
 ﻿using Core;
 using System;
 
-namespace Memory
+namespace Visualizer
 {
     public class Ram
     {
@@ -35,7 +35,6 @@ namespace Memory
 
         public void SetVariable(int addressIndex, Variable variable)
         {
-            var memoryAddress = GetMemoryAddress(addressIndex);
             MemoryAddresses[addressIndex].Variable = variable;
         }
 
@@ -56,6 +55,7 @@ namespace Memory
                 var indexColor = address.AddressIndex >= (MemoryAddresses.Length / 2) - 1 ? ConsoleColor.DarkYellow : ConsoleColor.Blue;
                 string variableTypeName = string.Empty;
                 string variableValue = string.Empty;
+                bool lastVariableChanged = false;
 
                 if (address.Variable != null)
                 {
@@ -64,12 +64,18 @@ namespace Memory
                         ? $"\"{address.Variable.Value}\"" 
                         : address.Variable.Value;
                     variableValue += $"{(address.Variable.Type is RefType ? " (ref)" : string.Empty)}";
+                    lastVariableChanged = address.Variable.LastChanged;
                 }
 
                 Console.ForegroundColor = lineColor;
                 ConsoleAid.Print(typeAndNameVarialbeLineLength);
                 ConsoleAid.PrintLine(valueLineLength, '-');
                 Console.CursorLeft = colStart;
+
+                if (lastVariableChanged)
+                {
+                    Console.BackgroundColor = ConsoleColor.Cyan;
+                }
 
                 Console.ForegroundColor = ConsoleColor.Green;
                 ConsoleAid.PrintText(typeAndNameVarialbeLineLength, variableTypeName);
@@ -86,6 +92,8 @@ namespace Memory
                 Console.ForegroundColor = lineColor;
                 Console.WriteLine("|");
                 Console.CursorLeft = colStart;
+
+                Console.BackgroundColor = ConsoleColor.White;
             }
 
             ConsoleAid.Print(typeAndNameVarialbeLineLength);

@@ -1,4 +1,4 @@
-﻿namespace Memory
+﻿namespace Visualizer
 {
     public abstract class DataType
     {
@@ -10,6 +10,13 @@
         {
             Name = name;
             Defaultvalue = defaultValue;
+        }
+
+        public override bool Equals(object obj)
+        {
+            DataType other = (DataType)obj;
+
+            return Name == other.Name;
         }
     }
 }

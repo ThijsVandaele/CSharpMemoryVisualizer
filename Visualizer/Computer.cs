@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Memory
+namespace Visualizer
 {
     public class Computer
     {
@@ -30,7 +30,7 @@ namespace Memory
         }
 
         private Ram Ram { get; set; }
-
+        public Variable LastVariableChanged { get; set; }
         public IList<Variable> Variables { get; set; } = new List<Variable>();
         public IList<DataType> Types { get; set; } = new List<DataType>();
         private IList<string> SourceCode { get; set; } = new List<string>();
@@ -38,35 +38,20 @@ namespace Memory
         private int NextAvailableStack { get; set; }
         private int NextAvailableHeap { get; set; }
 
-        public void DeclareValueVariable(DataType dataType, string name)
+        public void CreateCustomType(string name, List<Property> properties)
         {
-            if(!(dataType is ValueType type))
-            {
-                throw new ArgumentException($"{nameof(dataType)} needs to be a value type");
-            }
-
-            if(!Types.Any(x => x.Name == type.Name))
-            {
-                throw new InvalidOperationException($"{dataType.Name} is not in the list of available types.");
-            }
-
-            if(Variables.Any(x => x.Name == name))
+            if (Variables.Any(x => x.Name == name))
             {
                 throw new InvalidOperationException($"Variable with name {name} already exists");
             }
 
-            var variable = new Variable
+            var newCustomType = new RefType(name)
             {
-                Name = name,
-                Type = dataType,
-                Value = dataType.Defaultvalue
+                Properties = properties
             };
 
-            Ram.SetVariable(NextAvailableStack, variable);
-
-            Variables.Add(variable);
-
-            NextAvailableStack++;
+            DataTypes.Types[DataTypes.customTypes].Add(newCustomType);
+            Types.Add(newCustomType);
         }
 
         public void InitializeValueVariable(DataType dataType, string name, string value)
@@ -98,8 +83,19 @@ namespace Memory
             Variables.Add(variable);
 
             NextAvailableStack++;
-
-            SourceCode.Add($"{dataType.Name} {name} = {value};");
+            
+            if(dataType.Equals(DataTypes.String))
+            {
+                SourceCode.Add($"{dataType.Name} {name} = \"{value}\";");
+            }
+            else if(dataType.Equals(DataTypes.Bool))
+            {
+                SourceCode.Add($"{dataType.Name} {name} = {(value == "0" ? "false" : "true")};");
+            }
+            else
+            {
+                SourceCode.Add($"{dataType.Name} {name} = {value};");
+            }
         }
 
         public void InitializeArrayVariable(DataType dataType, string name, int length)
@@ -139,7 +135,8 @@ namespace Memory
                 {
                     Name = $"{name}[{i}]",
                     Type = valueType,
-                    Value = valueType.Defaultvalue
+                    Value = valueType.Defaultvalue,
+                    Parent = variable
                 };
 
                 variable.Variables.Add(variableOnHeap);
@@ -155,27 +152,6 @@ namespace Memory
             NextAvailableStack++;
 
             SourceCode.Add($"{dataType.Name} {name} = new {valueType.Name}[{length}];");
-        }
-
-        public void SetValueOfVariable(Variable variable, string value)
-        {
-            variable.Value = value;
-        }
-
-        public void CreateCustomType(string name, List<Property> properties)
-        {
-            if (Variables.Any(x => x.Name == name))
-            {
-                throw new InvalidOperationException($"Variable with name {name} already exists");
-            }
-
-            var newCustomType = new RefType(name)
-            {
-                Properties = properties
-            };
-
-            DataTypes.Types[DataTypes.customTypes].Add(newCustomType);
-            Types.Add(newCustomType);
         }
 
         public void InitializeCustumTypeVariable(RefType customType, string name)
@@ -214,7 +190,8 @@ namespace Memory
                 {
                     Name = $"{name}.{property.Name}",
                     Type = property.Type,
-                    Value = property.Type.Defaultvalue
+                    Value = property.Type.Defaultvalue,
+                    Parent = variable
                 };
 
                 variable.Variables.Add(variableOnHeap);
@@ -230,6 +207,28 @@ namespace Memory
             NextAvailableStack++;
 
             SourceCode.Add($"{customType.Name} {name} = new {customType.Name}();");
+        }
+
+
+        public void SetValueOfVariable(Variable variable, string value)
+        {
+            variable.LastChanged = true;
+            LastVariableChanged = variable;
+
+            variable.Value = value;
+
+            if (variable.Type.Equals(DataTypes.String))
+            {
+                SourceCode.Add($"{variable.Name} = \"{value}\";");
+            }
+            else if (variable.Type.Equals(DataTypes.Bool))
+            {
+                SourceCode.Add($"{variable.Name} = {(value == "0" ? "false" : "true")};");
+            }
+            else
+            {
+                SourceCode.Add($"{variable.Name} = {value};");
+            }
         }
         
         public void DrawRam()

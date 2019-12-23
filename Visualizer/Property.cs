@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Memory
+namespace Visualizer
 {
     public class Property
     {

@@ -1,4 +1,4 @@
-﻿namespace Memory
+﻿namespace Visualizer
 {
     public class MemoryAddress
     {

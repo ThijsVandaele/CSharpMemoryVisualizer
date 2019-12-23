@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace Memory
+namespace Visualizer
 {
     public class DataTypes
     {
@@ -36,17 +36,6 @@ namespace Memory
         };
 
         public static IList<DataType> CustomTypes = new List<DataType>();
-
-        public static RefType GetCustomType(string name)
-        {
-            if (!Types[customTypes].Any(x => x.Name == name))
-            {
-                return null;
-            }
-
-           var type = (RefType)Types[customTypes].FirstOrDefault(x => x.Name == name);
-            return type;
-        }
 
         public static ValueType Int { get; } = new ValueType(DataTypesR.Int, "0");
         public static ValueType String { get; } = new ValueType(DataTypesR.String, "");
